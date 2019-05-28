@@ -30,7 +30,30 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  num_particles = 0;  // TODO: Set the number of particles
+  num_particles = 10;  // TODO: Set the number of particles
+
+  // define normal distributions for sensor noise
+  std::random_device rd{};
+  std::mt19937 gen{rd()};
+  // values near the mean are the most likely
+  // standard deviation affects the dispersion of generated values from the mean
+  std::normal_distribution<double> N_x_init(0, std[0]);
+  std::normal_distribution<double> N_y_init(0, std[1]);
+  std::normal_distribution<double> N_theta_init(0, std[2]);
+
+  // init particles
+  for (int i = 0; i < num_particles; i++) {
+    Particle p;
+
+    p.x = N_x_init(gen);
+    p.y = N_y_init(gen);
+    p.theta = N_theta_init(gen);
+    p.weight = 1.0;
+
+    particles.push_back(p);
+  }
+
+  is_initialized = true;
 
 }
 
