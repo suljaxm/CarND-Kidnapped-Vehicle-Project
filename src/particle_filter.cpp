@@ -37,9 +37,9 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   std::mt19937 gen{rd()};
   // values near the mean are the most likely
   // standard deviation affects the dispersion of generated values from the mean
-  std::normal_distribution<double> N_x_init(0, std[0]);
-  std::normal_distribution<double> N_y_init(0, std[1]);
-  std::normal_distribution<double> N_theta_init(0, std[2]);
+  std::normal_distribution<double> N_x_init(x, std[0]);
+  std::normal_distribution<double> N_y_init(y, std[1]);
+  std::normal_distribution<double> N_theta_init(theta, std[2]);
 
   // init particles
   for (int i = 0; i < num_particles; i++) {
