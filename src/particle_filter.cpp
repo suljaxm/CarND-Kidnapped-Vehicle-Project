@@ -30,7 +30,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  num_particles = 10;  // TODO: Set the number of particles
+  num_particles = 100;  // TODO: Set the number of particles
 
   // define normal distributions for sensor noise
   std::random_device rd{};
@@ -240,6 +240,42 @@ void ParticleFilter::resample() {
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
 
+  vector<Particle> new_particles;
+
+  // get all of the current weights
+  vector<double> weights;
+  for (int i = 0; i < num_particles; i++) {
+    weights.push_back(particles[i].weight);
+  }
+
+  // generate random starting index for resampling wheel
+  std::random_device rd{};
+  std::mt19937 gen{rd()};
+  // values near the mean are the most likely
+  // standard deviation affects the dispersion of generated values from the mean
+  std::uniform_int_distribution<int> uniintdist(0, num_particles-1);
+  auto index = uniintdist(gen);
+
+  // get max weight
+  auto maxPosition = std::max_element(weights.begin(), weights.end());
+  double max_weight = *maxPosition;
+
+  // uniform random distribution [0.0, max_weight)
+  std::uniform_real_distribution<double> unirealdist(0.0, max_weight);
+
+  double beta = 0.0;
+
+  // spin the resample wheel!
+  for (int i = 0; i < num_particles; i++) {
+    beta += unirealdist(gen) * 2.0;
+    while (beta > weights[index]) {
+      beta -= weights[index];
+      index = (index + 1)%num_particles;
+    }
+    new_particles.push_back(particles[index]);
+  }
+
+  particles = new_particles;
 }
 
 void ParticleFilter::SetAssociations(Particle& particle, 
