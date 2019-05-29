@@ -30,7 +30,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  num_particles = 100;  // TODO: Set the number of particles
+  num_particles = 50;  // TODO: Set the number of particles
 
   // define normal distributions for sensor noise
   std::random_device rd{};
@@ -75,13 +75,13 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   std::normal_distribution<double> N_y(0, std_pos[1]);
   std::normal_distribution<double> N_theta(0, std_pos[2]);
 
-  for (int i = 0; i < num_particles; i++) {
+  for (int i = 0; i < num_particles; i++) { 
 
     // calculate new state
     // add a check for very low value of yaw_rate to get rid of 0
-	  if (fabs(yaw_rate) < 0.0001) {
-	    particles[i].x += velocity*cos(particles[i].theta) * delta_t;
-	    particles[i].y += velocity*sin(particles[i].theta) * delta_t;
+    if (fabs(yaw_rate) < 0.0001) {
+	    particles[i].x += velocity*cos(particles[i].theta)*delta_t;
+	    particles[i].y += velocity*sin(particles[i].theta)*delta_t;
     }else{
       particles[i].x += velocity/yaw_rate*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta));
       particles[i].y += velocity/yaw_rate*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate*delta_t));
