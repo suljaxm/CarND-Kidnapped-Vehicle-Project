@@ -66,6 +66,27 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
+  // define normal distributions for sensor noise
+  std::random_device rd{};
+  std::mt19937 gen{rd()};
+  // values near the mean are the most likely
+  // standard deviation affects the dispersion of generated values from the mean
+  std::normal_distribution<double> N_x(0, std_pos[0]);
+  std::normal_distribution<double> N_y(0, std_pos[1]);
+  std::normal_distribution<double> N_theta(0, std_pos[2]);
+
+  for (int i = 0; i < num_particles; i++) {
+
+    // calculate new state
+    particles[i].x += velocity/yaw_rate*(sin(particles[i].theta + yaw_rate*delta_t) - sin(particles[i].theta));
+    particles[i].y += velocity/yaw_rate*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate*delta_t));
+    particles[i].theta += yaw_rate*delta_t;
+
+    // add noise
+    particles[i].x += N_x(gen);
+    particles[i].y += N_y(gen);
+    particles[i].theta += N_theta(gen);
+  }
 
 }
 
@@ -196,13 +217,13 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       mu_y = t_o.y;
       // calculate normalization term
       double gauss_norm;
-      gauss_norm = 1 / (2 * M_PI * sig_x * sig_y);
+      gauss_norm = 1/(2*M_PI*sig_x*sig_y);
       // calculate exponent
       double exponent;
-      exponent = (pow(x_obs - mu_x, 2) / (2 * pow(sig_x, 2))) + (pow(y_obs - mu_y, 2) / (2 * pow(sig_y, 2)));
+      exponent = (pow(x_obs - mu_x, 2)/(2*pow(sig_x, 2))) + (pow(y_obs - mu_y, 2)/(2*pow(sig_y, 2)));
       // calculate weight using normalization terms and exponent
       double weight;
-      weight = gauss_norm * exp(-exponent);
+      weight = gauss_norm*exp(-exponent);
 
       // product of this obersvation weight with total observations weight
       particles[i].weight *= weight;
