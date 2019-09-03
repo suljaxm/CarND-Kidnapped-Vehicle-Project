@@ -92,13 +92,7 @@ Here is the main protocol that main.cpp uses for uWebSocketIO in communicating w
 ["best_particle_sense_y"] <= list of sensed y positions
 
 
-Your job is to build out the methods in `particle_filter.cpp` until the simulator output says:
-
-```
-Success! Your particle filter passed!
-```
-
-## Date
+## Data
 You can find the inputs to the particle filter in the `data` directory.
 
 ### The Map*
